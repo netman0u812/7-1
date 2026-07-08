@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FPMS Architecture — Firewall Policy Management System</title>
+<style>
+:root {
+  --bg0:    #0E1B28;
+  --bg1:    #162436;
+  --bg2:    #1E3248;
+  --bg3:    #263D58;
+  --t1:     #C8DCF0;
+  --t2:     #6A90B0;
+  --t3:     #3A5870;
+  --amber:  #D4A820;
+  --amber2: #ECC84A;
+  --teal:   #1A9070;
+  --teal2:  #42C49A;
+  --coral:  #C04828;
+  --coral2: #E87858;
+  --purple: #7068C8;
+  --purple2:#A099E8;
+  --mono:   'JetBrains Mono','Fira Mono','Cascadia Code','Courier New',monospace;
+  --serif:  Georgia,'Times New Roman',serif;
+  --sans:   'Inter','Segoe UI',system-ui,sans-serif;
+  --rule:   rgba(100,160,220,.14);
+  --rule2:  rgba(100,160,220,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg0);color:var(--t1);font-family:var(--sans);line-height:1.65}
+
+/* ── Top bar ── */
+.topbar{position:sticky;top:0;z-index:200;background:rgba(14,27,40,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule);height:46px;display:flex;align-items:center;padding:0 1.5rem;gap:1.2rem}
+.topbar-logo{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--amber);letter-spacing:.2em}
+.topbar-title{font-size:.78rem;color:var(--t2)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.75rem;font-family:var(--mono);font-size:.68rem;color:var(--t3)}
+.topbar-tag{background:var(--bg2);border:1px solid var(--rule);padding:.18rem .6rem;border-radius:3px;color:var(--t2)}
+
+/* ── Layout ── */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh;max-width:1280px;margin:0 auto}
+
+/* ── TOC ── */
+.toc{position:sticky;top:46px;height:calc(100vh - 46px);overflow-y:auto;border-right:1px solid var(--rule);padding:1.5rem 0;font-size:.78rem}
+.toc::-webkit-scrollbar{width:4px}
+.toc::-webkit-scrollbar-track{background:transparent}
+.toc::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+.toc-section{padding:.2rem 1.25rem;font-family:var(--mono);font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.14em;margin-top:.8rem}
+.toc-section:first-child{margin-top:0}
+.toc a{display:block;padding:.3rem 1.25rem;color:var(--t2);text-decoration:none;border-left:2px solid transparent;transition:all .12s;line-height:1.35}
+.toc a:hover{color:var(--t1);background:rgba(100,160,220,.04);border-left-color:var(--t3)}
+.toc a.active{color:var(--amber);border-left-color:var(--amber);background:rgba(212,168,32,.05)}
+.toc a.sub{padding-left:2rem;font-size:.73rem;color:var(--t3)}
+.toc a.sub:hover{color:var(--t2)}
+
+/* ── Content ── */
+.content{padding:3rem 3.5rem 6rem;max-width:860px}
+
+/* ── Typography ── */
+.doc-eyebrow{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:.6rem}
+.doc-title{font-family:var(--serif);font-size:2.4rem;font-weight:normal;color:var(--t1);letter-spacing:-.01em;line-height:1.15;margin-bottom:.6rem}
+.doc-subtitle{font-size:1rem;color:var(--t2);max-width:600px;margin-bottom:2rem;line-height:1.7}
+.doc-meta{display:flex;gap:2rem;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--rule)}
+.meta-item label{font-family:var(--mono);font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.2rem}
+.meta-item span{font-size:.82rem;color:var(--t2)}
+
+h2{font-family:var(--serif);font-size:1.5rem;font-weight:normal;color:var(--t1);margin:3.5rem 0 .5rem;padding-top:.5rem}
+h2.first{margin-top:0}
+h3{font-size:.95rem;font-weight:600;color:var(--t1);margin:2rem 0 .4rem}
+h4{font-family:var(--mono);font-size:.75rem;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin:1.5rem 0 .5rem}
+p{color:var(--t2);font-size:.9rem;margin-bottom:.9rem;line-height:1.72}
+p:last-child{margin-bottom:0}
+.lead{font-size:1rem;color:var(--t1);line-height:1.7}
+strong{color:var(--t1);font-weight:600}
+
+/* ── Section dividers ── */
+.section-rule{height:1px;background:var(--rule);margin:0 0 .5rem}
+
+/* ── Inline code ── */
+code{font-family:var(--mono);font-size:.78em;background:var(--bg2);padding:.1em .4em;border-radius:3px;color:var(--teal2)}
+
+/* ── Code blocks ── */
+pre{background:var(--bg1);border:1px solid var(--rule);border-left:3px solid var(--teal);border-radius:0 4px 4px 0;padding:1rem 1.25rem;font-family:var(--mono);font-size:.75rem;line-height:1.75;overflow-x:auto;margin:1rem 0;color:var(--teal2)}
+pre .c{color:var(--t3)}
+pre .k{color:var(--purple2)}
+pre .s{color:var(--coral2)}
+pre .v{color:var(--amber2)}
+pre .t{color:var(--t2)}
+
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin:1rem 0}
+thead tr{border-bottom:1px solid var(--rule2)}
+th{font-family:var(--mono);font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .75rem;text-align:left;font-weight:500}
+td{padding:.5rem .75rem;color:var(--t2);border-bottom:1px solid var(--rule)}
+tr:last-child td{border-bottom:none}
+td code{font-size:.72em}
+td strong{color:var(--t1)}
+tr:hover td{background:rgba(100,160,220,.03)}
+
+/* ── Tag/badge ── */
+.tag{display:inline-block;font-family:var(--mono);font-size:.65rem;padding:.15rem .45rem;border-radius:3px;margin:.1rem}
+.tag-teal  {background:rgba(26,144,112,.18);color:var(--teal2);border:1px solid rgba(26,144,112,.3)}
+.tag-amber {background:rgba(212,168,32,.14);color:var(--amber2);border:1px solid rgba(212,168,32,.25)}
+.tag-coral {background:rgba(192,72,40,.16);color:var(--coral2);border:1px solid rgba(192,72,40,.28)}
+.tag-purple{background:rgba(112,104,200,.16);color:var(--purple2);border:1px solid rgba(112,104,200,.28)}
+.tag-gray  {background:var(--bg2);color:var(--t2);border:1px solid var(--rule)}
+
+/* ── Callout boxes ── */
+.callout{border-left:3px solid;padding:.75rem 1rem;margin:1.2rem 0;font-size:.86rem;line-height:1.65}
+.callout p{font-size:.86rem;margin-bottom:0}
+.callout-warn{border-color:var(--amber);background:rgba(212,168,32,.06)}
+.callout-warn p{color:var(--amber2)}
+.callout-info{border-color:var(--teal);background:rgba(26,144,112,.05)}
+.callout-info p{color:var(--t2)}
+.callout-err{border-color:var(--coral);background:rgba(192,72,40,.07)}
+.callout-err p{color:var(--coral2)}
+
+/* ── Definition list ── */
+dl{margin:1rem 0}
+dt{font-family:var(--mono);font-size:.75rem;color:var(--t1);margin-top:1rem;font-weight:600}
+dd{font-size:.86rem;color:var(--t2);padding-left:1.25rem;margin-top:.2rem;line-height:1.65}
+
+/* ── Stat row ── */
+.stat-row{display:flex;gap:2.5rem;margin:1.5rem 0;flex-wrap:wrap}
+.stat-num{font-family:var(--serif);font-size:2rem;color:var(--amber);line-height:1}
+.stat-label{font-family:var(--mono);font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.3rem}
+
+/* ── Flow diagram ── */
+.flow-diagram{background:var(--bg1);border:1px solid var(--rule);border-radius:4px;padding:1.5rem;margin:1.5rem 0;overflow-x:auto}
+.flow-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap}
+.flow-row:last-child{margin-bottom:0}
+.flow-label{font-family:var(--mono);font-size:.62rem;color:var(--t3);width:90px;flex-shrink:0;text-align:right;padding-right:.75rem;border-right:1px solid var(--rule);letter-spacing:.06em;text-transform:uppercase}
+.fzone{padding:.28rem .75rem;border-radius:3px;font-family:var(--mono);font-size:.7rem;font-weight:600;white-space:nowrap}
+.fz-u{background:rgba(192,72,40,.14);color:var(--coral2);border:1px solid rgba(192,72,40,.25)}
+.fz-d{background:rgba(212,168,32,.1);color:var(--amber2);border:1px solid rgba(212,168,32,.2)}
+.fz-t{background:rgba(26,144,112,.1);color:var(--teal2);border:1px solid rgba(26,144,112,.2)}
+.fz-v{background:rgba(112,104,200,.1);color:var(--purple2);border:1px solid rgba(112,104,200,.2)}
+.farrow{color:var(--t3);font-size:1rem}
+.fnat{margin-left:auto;font-family:var(--mono);font-size:.65rem;color:var(--t3);white-space:nowrap}
+.fstacks{font-family:var(--mono);font-size:.62rem;color:var(--t3);margin-left:1rem;flex-basis:100%;padding-left:90px}
+
+/* ── Object model grid ── */
+.obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);margin:1rem 0}
+.obj-cell{background:var(--bg1);padding:1rem}
+.obj-type-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem}
+.obj-cell.ng  .obj-type-label{color:var(--teal2)}
+.obj-cell.ao  .obj-type-label{color:var(--amber2)}
+.obj-cell.ad  .obj-type-label{color:var(--purple2)}
+.obj-cell.svc .obj-type-label{color:var(--coral2)}
+.obj-cell h4{font-family:var(--sans);font-size:.85rem;color:var(--t1);margin:.2rem 0 .4rem;text-transform:none;letter-spacing:0}
+.obj-cell p{font-size:.8rem;color:var(--t2);margin-bottom:.5rem}
+.obj-examples{font-family:var(--mono);font-size:.68rem;color:var(--t3);line-height:1.8}
+
+/* ── Architecture diagram (SVG embed area) ── */
+.arch-svg-wrap{background:var(--bg1);border:1px solid var(--rule);padding:1.5rem;margin:1.5rem 0;overflow-x:auto}
+
+/* ── Findings list ── */
+.finding{display:flex;gap:.75rem;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid var(--rule)}
+.finding:last-child{border-bottom:none}
+.finding-sev{font-family:var(--mono);font-size:.62rem;font-weight:700;padding:.18rem .5rem;border-radius:2px;flex-shrink:0;margin-top:.12rem;letter-spacing:.06em}
+.fs-high{background:rgba(192,72,40,.2);color:var(--coral2)}
+.fs-med {background:rgba(212,168,32,.15);color:var(--amber2)}
+.fs-info{background:rgba(26,144,112,.15);color:var(--teal2)}
+.finding-body{font-size:.85rem;color:var(--t2);line-height:1.65}
+.finding-body strong{color:var(--t1)}
+
+/* ── Roadmap ── */
+.rm-grid{display:grid;grid-template-columns:100px 1fr;gap:0}
+.rm-row{display:contents}
+.rm-phase{padding:1.2rem .75rem 1.2rem 0;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.rm-row:last-child .rm-phase,.rm-row:last-child .rm-body{border-bottom:none}
+.rm-phase-label{font-family:var(--mono);font-size:.65rem;color:var(--amber);letter-spacing:.08em;text-transform:uppercase}
+.rm-phase-weeks{font-family:var(--mono);font-size:.7rem;color:var(--t3);margin-top:.2rem}
+.rm-body{padding:1.2rem 0 1.2rem 1.25rem;border-bottom:1px solid var(--rule)}
+.rm-title{font-size:.9rem;font-weight:600;color:var(--t1);margin-bottom:.3rem}
+.rm-desc{font-size:.82rem;color:var(--t2);line-height:1.65}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .toc{display:none}
+  .content{padding:2rem 1.5rem 4rem}
+  .obj-grid{grid-template-columns:1fr}
+  .doc-meta{flex-wrap:wrap;gap:1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">FPMS</span>
+  <span class="topbar-title">Firewall Policy Management System — Architecture</span>
+  <div class="topbar-right">
+    <span class="topbar-tag">CVS Health · InfoSec</span>
+    <span class="topbar-tag">Network Security Engineering</span>
+    <span class="topbar-tag">v1.0 · June 2026</span>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- ── TOC ── -->
+<nav class="toc" id="toc">
+  <div class="toc-section">Overview</div>
+  <a href="#intro">Introduction</a>
+  <a href="#problem">Problem statement</a>
+  <a href="#principles">Design principles</a>
+
+  <div class="toc-section">Data model</div>
+  <a href="#object-model">Object model</a>
+  <a href="#ng-ao">NG and AO catalog</a>
+  <a href="#ad-groups">AD domain controller groups</a>
+  <a href="#service-repo">Service repository</a>
+
+  <div class="toc-section">Topology</div>
+  <a href="#panorama-estate">Panorama estate</a>
+  <a href="#topology-model">Topology model</a>
+  <a href="#zone-model">Zone classification</a>
+  <a href="#flow-patterns">Flow patterns</a>
+  <a href="#ng-zone-map">NG→zone mapping</a>
+
+  <div class="toc-section">Security profiles</div>
+  <a href="#profile-groups">Profile groups</a>
+  <a href="#structures">Three structures</a>
+  <a href="#findings">Estate findings</a>
+
+  <div class="toc-section">System design</div>
+  <a href="#rule-builder">Rule builder</a>
+  <a href="#validation">Validation engine</a>
+  <a href="#data-pipeline">Data pipeline</a>
+  <a href="#api-layer">API layer</a>
+  <a href="#commit-path">Commit path</a>
+
+  <div class="toc-section">Delivery</div>
+  <a href="#deliverables">Deliverables</a>
+  <a href="#roadmap">Roadmap</a>
+  <a href="#3plz">3PLZ connection</a>
+</nav>
+
+<!-- ── Content ── -->
+<main class="content" id="content">
+
+<!-- ────────────────────────────── -->
+<!-- INTRO -->
+<!-- ────────────────────────────── -->
+<div id="intro">
+  <div class="doc-eyebrow">Architecture document</div>
+  <h1 class="doc-title">Firewall Policy<br>Management System</h1>
+  <p class="doc-subtitle">A topology-aware firewall rule builder that maps network groups and address objects to actual firewall zones — grounded in the live Palo Alto Panorama estate across four Panorama instances, 29 firewall stacks, and 55,826 shared address objects.</p>
+  <div class="doc-meta">
+    <div class="meta-item"><label>Program</label><span>FPMS — Firewall Policy Management</span></div>
+    <div class="meta-item"><label>Owner</label><span>Network Security Engineering</span></div>
+    <div class="meta-item"><label>Status</label><span>Prototype complete · API phase pending</span></div>
+    <div class="meta-item"><label>Version</label><span>1.0 · June 15, 2026</span></div>
+  </div>
+
+  <div class="stat-row">
+    <div><div class="stat-num">55,826</div><div class="stat-label">shared address objects</div></div>
+    <div><div class="stat-num">15,629</div><div class="stat-label">security rules</div></div>
+    <div><div class="stat-num">29</div><div class="stat-label">firewall stacks</div></div>
+    <div><div class="stat-num">728</div><div class="stat-label">EDL objects</div></div>
+    <div><div class="stat-num">98%</div><div class="stat-label">rules on alert-all-spg</div></div>
+  </div>
+</div>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="problem">Problem statement</h2>
+
+<p class="lead">Firewall rule construction at CVS Health is entirely manual, unguided, and disconnected from the underlying network topology.</p>
+
+<p>Engineers build rules by typing zone names freehand, selecting address objects with no validation against topology constraints, and defaulting to <code>Alert-All-SPG</code> because it's the path of least resistance. The result is a 15,629-rule rulebase with no zone coherence enforcement, no systematic security profile coverage, and no formal relationship between the 728 EDL-backed network objects maintained by the CCD platform and the zone names used in Panorama policies.</p>
+
+<p>Three compounding gaps drive this problem:</p>
+
+<dl>
+  <dt>No NG→zone join record</dt>
+  <dd>The CCD platform produces 728 External Dynamic List files organized into Network Groups (NG) and Address Objects (AO). Panorama policies reference zone names like <code>inside</code>, <code>DMZ</code>, <code>clouddmz</code>, <code>WEX-Meritain</code>. No formal mapping between these two namespaces exists anywhere in the estate. Engineers have no validated reference for which zone a given NG/AO belongs in.</dd>
+
+  <dt>No topology-aware rule construction tool</dt>
+  <dd>Panorama's native rule editor treats zone names as freetext strings. It does not know that <code>NG-PARTNER-OFFSHORE-CONTRACTOR</code> placed in the <code>trust</code> zone is a hard isolation violation, or that <code>AO-DATACENTER-SCOTTSDALE-AZ-SHEA-DC</code> belongs on the DMZ leg of the hairpin, not the trust leg. No tool enforces these constraints at rule creation time.</dd>
+
+  <dt>No profile selection guidance</dt>
+  <dd>Best-practice security profile groups — <code>BP_SPG_DMZ_Model</code>, <code>BP_SPG_User_Internet_Model</code> — are defined in shared on both internet-edge Panoramas but applied to fewer than 2% of rules. <code>Alert-All-SPG</code> (alert-only, no blocking) is the effective default on 15,448 of 15,629 rules.</dd>
+</dl>
+
+<div class="callout callout-err">
+  <p><strong>Security posture gap:</strong> The combination of no zone coherence enforcement and near-universal use of <code>Alert-All-SPG</code> means that misconfigured rules are neither detected at creation time nor blocked in the data path. Content inspection infrastructure exists but is inoperative on 98% of traffic.</p>
+</div>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="principles">Design principles</h2>
+
+<p>FPMS is built around five principles derived from analysis of the existing estate and the constraints of operating at CVS Health's scale.</p>
+
+<dl>
+  <dt>Topology-first</dt>
+  <dd>The firewall's physical and logical structure — interfaces, zones, zone protection profiles, virtual routers — is the root object. Every policy decision derives from the topology, not the other way around. Zone names are not freetext; they are properties of a specific firewall stack extracted from the live Panorama config.</dd>
+
+  <dt>Named objects only</dt>
+  <dd>No raw IP addresses in rules. Every source and destination is a named EDL-backed object (NG, AO, AD group) or a named service object. This is not a style preference — it is the prerequisite for the zone coherence model to function. A raw IP has no zone class; a named NG object does.</dd>
+
+  <dt>Zone coherence as a hard constraint</dt>
+  <dd>Each NG and AO category has an expected zone class (TRUST, DMZ, VPN-PARTNER, CLOUD-DMZ). Placing a PARTNER-category object in a TRUST zone is not a warning — it is a hard violation that must be resolved before a rule can be submitted. The mapping is encoded in <code>ng_zone_map.json</code> and enforced by the validation engine.</dd>
+
+  <dt>Profile groups are structural, not decorative</dt>
+  <dd>The security profile group applied to a rule is determined by the zone pair, not selected manually. A trust→DMZ rule gets <code>BP_SPG_DMZ_Model</code>. A trust→untrust egress rule gets <code>BP_SPG_User_Internet_Model</code>. A VPN-PARTNER→trust rule gets <code>Trusted-Apps</code>. The rule builder auto-suggests based on the destination zone's default and flags any deviation.</dd>
+
+  <dt>Grounded in live data</dt>
+  <dd>All topology data, zone definitions, EDL catalogs, and profile group definitions are extracted directly from the four Panorama config exports using deterministic Python scripts. Nothing is hand-curated or assumed. When the topology changes, the pipeline re-runs and the tool updates.</dd>
+</dl>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="object-model">Object model</h2>
+
+<p>The FPMS policy object model has four distinct types. Understanding the difference between NG and AO — the two EDL types — is central to understanding how zone assignment works.</p>
+
+<div class="obj-grid">
+  <div class="obj-cell ng">
+    <div class="obj-type-label">NG — Network Group</div>
+    <h4>Location / contextual subnets</h4>
+    <p>Answers <em>where are these IPs?</em> A geographic or organizational grouping of subnets. Maps to the <strong>TRUST</strong> zone — these are sources of traffic, not published targets.</p>
+    <div class="obj-examples">NG-CORP-CT &nbsp;·&nbsp; NG-CORP-RI &nbsp;·&nbsp; NG-CORP-TX<br>NG-DATACENTER-SCOTTSDALE-AZ-SHEA-DC<br>NG-CAREPLUS-BOSTON-MA-CAREPLUS<br>NG-PARTNER-OFFSHORE-CONTRACTOR<br>NG-VPN-MDC &nbsp;·&nbsp; NG-VPN-SHEA</div>
+  </div>
+  <div class="obj-cell ao">
+    <div class="obj-type-label">AO — Address Object</div>
+    <h4>Functional / application targets</h4>
+    <p>Answers <em>what is this IP used for?</em> A business function or site grouping. <strong>AO-DATACENTER-*</strong> maps to the <strong>DMZ</strong> zone — these are published server IPs on the extranet leg of the hairpin.</p>
+    <div class="obj-examples">AO-DATACENTER-MIDDLETOWN-CT-AETNA-MDC<br>AO-DATACENTER-SCOTTSDALE-AZ-SHEA-DC<br>AO-CORP-HARTFORD-CT-AETNA-HQ<br>AO-PARTNER-BHUBANESWAR-IN-INFOSYS<br>AO-COLO-ASHBURN-VA-EQUINIX</div>
+  </div>
+  <div class="obj-cell ad">
+    <div class="obj-type-label">AD Group — Domain Controllers</div>
+    <h4>Active Directory dynamic groups</h4>
+    <p>Tag-driven Panorama dynamic address groups covering ~300 DCs across 10+ post-merger domains. Both FQDN and IP variants exist. Maps to <strong>TRUST</strong> zone.</p>
+    <div class="obj-examples">AG_AD_ALL_FQDN &nbsp;·&nbsp; AG_AD_ALL_IP<br>AG_AD-AZ &nbsp;·&nbsp; AG_AD-RI &nbsp;·&nbsp; AG_AD-MID<br>AG_AD-WIN &nbsp;·&nbsp; AG_AD-Cloud &nbsp;·&nbsp; AG_AD-LGS<br>AG_AD-VIP (LDAP load-balanced VIPs)</div>
+  </div>
+  <div class="obj-cell svc">
+    <div class="obj-type-label">Service — Port / Protocol</div>
+    <h4>Named service objects and groups</h4>
+    <p>6,670 service objects and 1,683 service groups in Panorama shared. FPMS adds a cross-referenced repo linking service objects to App-IDs (Applipedia) and IANA port assignments.</p>
+    <div class="obj-examples">Active_Directory_Services (full AD suite)<br>tcp/88 · udp/389 · tcp/3268 · tcp/49152-65535<br>application-default (App-ID aligned)<br>IANA registry + Applipedia integration (planned)</div>
+  </div>
+</div>
+
+<!-- ────────────────────────────── -->
+<h3 id="ng-ao">NG and AO catalog structure</h3>
+
+<p>The CCD platform's <code>build_network_groups.py</code> produces one EDL file per object. The naming convention encodes the full taxonomy: <code>{TYPE}-{BUSINESS-UNIT}-{CITY}-{STATE}-{FUNCTION}.txt</code>. This naming is not cosmetic — the first segment after the type prefix is the category key that drives zone assignment.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Count NG</th><th>Count AO</th><th>Zone class</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>CORP</strong></td><td>38</td><td>87</td><td><span class="tag tag-teal">TRUST</span></td><td><code>NG-CORP-CT</code> — all CT corporate subnets, 431 CIDRs</td></tr>
+    <tr><td><strong>CAREPLUS</strong></td><td>109</td><td>108</td><td><span class="tag tag-teal">TRUST</span></td><td><code>NG-CAREPLUS-SEATTLE-WA-CAREPLUS</code></td></tr>
+    <tr><td><strong>OMNICARE</strong></td><td>79</td><td>78</td><td><span class="tag tag-teal">TRUST</span></td><td><code>NG-OMNICARE-RICHMOND-VA-OMNICARE</code></td></tr>
+    <tr><td><strong>DATACENTER</strong></td><td>8</td><td>7</td><td><span class="tag tag-teal">TRUST</span> (NG) / <span class="tag tag-amber">DMZ</span> (AO)</td><td><code>AO-DATACENTER-MIDDLETOWN-CT-AETNA-MDC</code> — 1,290 subnets</td></tr>
+    <tr><td><strong>PARTNER</strong></td><td>13</td><td>12</td><td><span class="tag tag-purple">VPN-PARTNER</span></td><td><code>NG-PARTNER-OFFSHORE-CONTRACTOR</code> — 44 subnets</td></tr>
+    <tr><td><strong>VPN</strong></td><td>5</td><td>—</td><td><span class="tag tag-purple">VPN-PARTNER</span></td><td><code>NG-VPN-MDC</code>, <code>NG-VPN-PARTNERS</code></td></tr>
+    <tr><td><strong>CLOUD / AWS / AZURE / GCP</strong></td><td>7</td><td>4</td><td><span class="tag tag-gray">CLOUD-DMZ</span></td><td><code>NG-AZURE</code> — 2,762 subnets; <code>NG-GCP</code> — 1,564 subnets</td></tr>
+    <tr><td><strong>RETAIL</strong></td><td>1</td><td>—</td><td><span class="tag tag-teal">TRUST</span> (PCI)</td><td><code>NG-RETAIL</code> — 13,076 subnets, PCI-scoped</td></tr>
+    <tr><td><strong>COLO</strong></td><td>6</td><td>5</td><td><span class="tag tag-amber">DMZ</span> (AO) / <span class="tag tag-teal">TRUST</span> (NG)</td><td><code>NG-COLO-LAS-VEGAS-NV-SWITCH-COLO</code></td></tr>
+  </tbody>
+</table>
+
+<!-- ────────────────────────────── -->
+<h3 id="ad-groups">Active Directory domain controller groups</h3>
+
+<p>The AD object set was built from a separate Panorama spreadsheet covering 16 location tags, ~300 individual DC objects, and two aggregate groups. The model uses Panorama's dynamic address group feature: each per-location group (<code>AG_AD-AZ</code>, <code>AG_AD-RI</code>, etc.) has a tag filter expression. Adding a new DC requires only creating the address object with the correct tag — the groups update automatically.</p>
+
+<p>Two traffic patterns consume these groups:</p>
+<ul style="font-size:.87rem;color:var(--t2);padding-left:1.5rem;margin:.5rem 0 .9rem;line-height:1.8">
+  <li><strong>AD-to-AD replication:</strong> source <code>AG_AD_ALL_FQDN</code> → destination <code>AG_AD_ALL_FQDN</code>, service <code>Active_Directory_Services</code></li>
+  <li><strong>User-to-DC authentication:</strong> source NG-CORP-* (by region) → destination <code>AG_AD-{LOCATION}</code> matching the user's domain</li>
+</ul>
+
+<!-- ────────────────────────────── -->
+<h3 id="service-repo">Service repository</h3>
+
+<p>The service repo is the one gap not yet closed in the prototype. The planned architecture cross-references three sources:</p>
+
+<ul style="font-size:.87rem;color:var(--t2);padding-left:1.5rem;margin:.5rem 0 .9rem;line-height:1.8">
+  <li><strong>Panorama shared service objects</strong> — 6,670 objects already defined, extractable via REST API</li>
+  <li><strong>Applipedia API</strong> — <code>GET /restapi/v10.1/Objects/Applications</code> — App-ID name, category, default ports, risk level, <code>application-default</code> flag</li>
+  <li><strong>IANA Service Name Registry</strong> — downloadable CSV from <code>iana.org/assignments/service-names-port-numbers</code>, ~10,000 authoritative port-to-name mappings</li>
+</ul>
+
+<p>The cross-reference enables two behaviors in the rule builder: select an App-ID and ports auto-populate from Applipedia defaults; select a port and candidate App-IDs surface. A warning fires when an App-ID is selected with a non-default port (e.g., <code>kerberos</code> on 443), which would require an explicit service object rather than <code>application-default</code>.</p>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="panorama-estate">Panorama estate</h2>
+
+<p>The estate consists of four Panorama instances running PAN-OS 11.2.10, organized into two mirrored pairs. MID and WIN are identical configs managing internal DC firewalls. PAZSHDC and RRISHDC are identical configs managing internet-edge firewalls.</p>
+
+<table>
+  <thead><tr><th>Instance</th><th>Location</th><th>Role</th><th>Device groups</th><th>Security rules</th><th>NAT rules</th></tr></thead>
+  <tbody>
+    <tr><td><strong>MID-PAN-PROD-01</strong></td><td>Middletown CT</td><td>Internal DC</td><td>13</td><td>~3,200</td><td>~2,100</td></tr>
+    <tr><td><strong>WIN-PAN-PROD-01</strong></td><td>Windsor CT</td><td>Internal DC (mirror)</td><td>13</td><td>~3,200</td><td>~2,100</td></tr>
+    <tr><td><strong>PAZSHDC-SEC-PAN-PROD-01</strong></td><td>Shea AZ</td><td>Internet edge</td><td>10</td><td>15,629</td><td>~7,500</td></tr>
+    <tr><td><strong>RRISHDC-SEC-PAN-PROD-01</strong></td><td>Cumberland RI</td><td>Internet edge (mirror)</td><td>10</td><td>15,629</td><td>~7,500</td></tr>
+  </tbody>
+</table>
+
+<h4>Key device groups</h4>
+<table>
+  <thead><tr><th>Device group</th><th>Stack</th><th>Pattern</th><th>Rules</th><th>NAT</th></tr></thead>
+  <tbody>
+    <tr><td><strong>MID-WIN-GLR</strong></td><td>mid-glr / win-glr (PA-5450/5400F)</td><td>SIMPLE-EDGE</td><td>924</td><td>—</td></tr>
+    <tr><td><strong>mid-fw-dmz / win-fw-dmz</strong></td><td>PA-3400 HA</td><td>DC-DMZ</td><td>426 / 376</td><td>10 each</td></tr>
+    <tr><td><strong>mid-fw-clouddmz / win-fw-clouddmz</strong></td><td>PA-3400 HA</td><td>DC-DMZ</td><td>225 / 160</td><td>9 each</td></tr>
+    <tr><td><strong>mid-fw-edmz / win-fw-edmz</strong></td><td>PA-5450 HA</td><td>SIMPLE-EDGE</td><td>189 / 179</td><td>1,372 / 1,009</td></tr>
+    <tr><td><strong>DG_AZ_Egress</strong></td><td>PAZSHDC-SEC-WIR (PA-5450 HA)</td><td>INTERNET-EDGE</td><td>5,923</td><td>6,462</td></tr>
+    <tr><td><strong>DG_RI_EXT_APP</strong></td><td>RRIWSDC-SEC-EXT-APP (PA-1400 HA)</td><td>INTERNET-EDGE</td><td>3,036</td><td>104</td></tr>
+    <tr><td><strong>DG_RI_Egress</strong></td><td>RRIWSCP-SEC-EXT-EMPTEMP (PA-5430 HA)</td><td>SIMPLE-EDGE</td><td>4,162</td><td>67</td></tr>
+    <tr><td><strong>DG_LV_3rd_Party</strong></td><td>LV-3rd_Party (PA-5445 HA)</td><td>PARTNER-VPN</td><td>10</td><td>—</td></tr>
+    <tr><td><strong>DG_HOL_PCI</strong></td><td>Stack_HOL-SEC-M1A-PCI</td><td>SIMPLE-EDGE</td><td>266</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="topology-model">Topology model</h2>
+
+<p>The topology model has three structures that share the zone as their common join key. Every policy decision ultimately resolves to a zone name on a specific firewall stack.</p>
+
+<div class="flow-diagram">
+  <div style="font-family:var(--mono);font-size:.62rem;color:var(--t3);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.12em">Three-structure model — zone as universal join key</div>
+
+  <div style="display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr;gap:0;align-items:start;margin-bottom:1rem">
+    <div style="background:var(--bg2);padding:.75rem;border-left:3px solid var(--teal)">
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--teal2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Structure 1</div>
+      <div style="font-size:.8rem;font-weight:600;color:var(--t1);margin-bottom:.3rem">Interfaces → Zones</div>
+      <div style="font-family:var(--mono);font-size:.68rem;color:var(--t3);line-height:1.7">Physical and logical interfaces assigned to zones. Defined in Panorama templates. Sets trust boundary.</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:1.2rem">→</div>
+    <div style="background:var(--bg2);padding:.75rem;border-left:3px solid var(--amber)">
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--amber2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Structure 2</div>
+      <div style="font-size:.8rem;font-weight:600;color:var(--t1);margin-bottom:.3rem">Security profiles → Zone</div>
+      <div style="font-family:var(--mono);font-size:.68rem;color:var(--t3);line-height:1.7">AV, IPS/vuln, URL filter, file blocking, WildFire. Bundled as profile group. Applied per rule by zone pair.</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:1.2rem">→</div>
+    <div style="background:var(--bg2);padding:.75rem;border-left:3px solid var(--purple)">
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--purple2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Structure 3</div>
+      <div style="font-size:.8rem;font-weight:600;color:var(--t1);margin-bottom:.3rem">Rules → Zone</div>
+      <div style="font-family:var(--mono);font-size:.68rem;color:var(--t3);line-height:1.7">Security rules reference from/to zone pairs. Objects validated against zone class. Profile group auto-assigned from S2.</div>
+    </div>
+  </div>
+
+  <div style="background:var(--bg0);border:1px solid var(--rule);padding:.6rem .9rem;font-family:var(--mono);font-size:.68rem;color:var(--t3)">
+    Packet evaluation order: ingress interface → S1 zone lookup → S3 rule match (src/dst/app) → S2 profile inspection → allow/deny + log forward
+  </div>
+</div>
+
+<!-- ────────────────────────────── -->
+<h3 id="zone-model">Zone classification</h3>
+
+<p>Zones are classified into five semantic classes. The classification drives which NG/AO categories are valid in each zone, which profile group is the default, and whether SNAT applies.</p>
+
+<table>
+  <thead><tr><th>Class</th><th>Zone names in estate</th><th>NG categories</th><th>AO categories</th><th>Default profile</th><th>SNAT</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="tag tag-teal">TRUST</span></td>
+      <td><code>inside</code> · <code>Inside</code> · <code>Trust</code> · <code>Trust-Inside</code></td>
+      <td>CORP · CAREPLUS · OMNICARE · DATACENTER · SPECIALTY · DR · COLO · VPN (sub-zones)</td>
+      <td>CORP · CAREPLUS · OMNICARE · DATACENTER</td>
+      <td><code>BP_SPG_User_Internet_Model</code></td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-amber">DMZ</span></td>
+      <td><code>dmz</code> · <code>DMZ</code> · <code>DMZ2</code> · <code>DMZ-PDE</code> · <code>xpe</code> · <code>APP_DMZ</code> · <code>ebDMZ</code> · <code>clouddmz</code> · <code>qadmz</code></td>
+      <td>NAAS</td>
+      <td>DATACENTER · COLO</td>
+      <td><code>BP_SPG_DMZ_Model</code></td>
+      <td>Yes (DNAT inbound)</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-coral">UNTRUST</span></td>
+      <td><code>outside</code> · <code>Outside</code> · <code>Internet</code> · <code>Untrust</code> · <code>Untrust-VPN</code></td>
+      <td>None — use <code>any</code></td>
+      <td>None</td>
+      <td><code>Alert-All-SPG</code></td>
+      <td>Yes (SNAT egress)</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-purple">VPN-PARTNER</span></td>
+      <td><code>vpn1</code> · <code>vpn2</code> · <code>WEX-Meritain</code> · <code>EBIX-Meritain</code> · <code>Test-VPN</code> · <code>MPLS_DMZ-*</code></td>
+      <td>VPN · PARTNER</td>
+      <td>PARTNER · NAAS</td>
+      <td><code>Trusted-Apps</code></td>
+      <td>No (routed tunnels)</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-gray">CLOUD-DMZ</span></td>
+      <td><code>clouddmz</code></td>
+      <td>CLOUD · AWS · AZURE · GCP</td>
+      <td>AWS · AZURE · GCP</td>
+      <td><code>BP_SPG_DMZ_Model</code></td>
+      <td>Yes (SNAT to interface)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout-warn">
+  <p><strong>Zone naming inconsistency:</strong> 22+ distinct zone names exist across 29 stacks. <code>inside</code> and <code>Inside</code> are different strings and different zones on different stacks. The rule builder enforces zone selection from a topology-derived dropdown — freetext zone entry is not permitted.</p>
+</div>
+
+<!-- ────────────────────────────── -->
+<h3 id="flow-patterns">Structural flow patterns</h3>
+
+<p>Every firewall stack maps to one of four structural patterns. The pattern determines the valid zone combinations, the NAT model, and which NG/AO categories are valid in each position. Building a rule against the wrong pattern produces a coherence violation.</p>
+
+<div class="flow-diagram">
+
+  <div class="flow-row">
+    <div class="flow-label">Pattern 1</div>
+    <span class="fzone fz-u">untrust / outside</span>
+    <span class="farrow">→</span>
+    <span class="fzone fz-d">extranet DMZ</span>
+    <span class="farrow">→</span>
+    <span class="fzone fz-t">trust / inside</span>
+    <span class="fnat">DNAT inbound · SNAT egress</span>
+    <div class="fstacks">Internet edge hairpin &nbsp;·&nbsp; PAZSHDC-SEC-WIR · RRIWSDC-SEC-EXT-APP · DG_AZ_Egress (5,923 rules) · DG_RI_EXT_APP</div>
+  </div>
+
+  <div class="flow-row" style="margin-top:.75rem">
+    <div class="flow-label">Pattern 2</div>
+    <span class="fzone fz-d">dmz / clouddmz</span>
+    <span class="farrow">↔</span>
+    <span class="fzone fz-t">inside</span>
+    <span class="fnat">static 1:1 or no NAT</span>
+    <div class="fstacks">DC DMZ (no internet leg) &nbsp;·&nbsp; mid-dmz · win-dmz · mid-clouddmz · win-clouddmz · mid-qadmz</div>
+  </div>
+
+  <div class="flow-row" style="margin-top:.75rem">
+    <div class="flow-label">Pattern 3</div>
+    <span class="fzone fz-t">trust / inside</span>
+    <span class="farrow">↔</span>
+    <span class="fzone fz-u">outside / internet</span>
+    <span class="fnat">SNAT egress or 1:1 NAT per server</span>
+    <div class="fstacks">Simple edge &nbsp;·&nbsp; mid-glr · win-glr · mid-edmz (1,372 NAT) · win-edmz (1,009 NAT) · mid-officeext · HOL-PCI</div>
+  </div>
+
+  <div class="flow-row" style="margin-top:.75rem">
+    <div class="flow-label">Pattern 4</div>
+    <span class="fzone fz-v">VPN-PARTNER</span>
+    <span class="farrow">↔</span>
+    <span class="fzone fz-t">Trust-Inside</span>
+    <span class="fnat">no NAT — routed IPSec</span>
+    <div class="fstacks">Partner VPN &nbsp;·&nbsp; LV-3rd_Party (WEX-Meritain · EBIX-Meritain) · mid-officeext (vpn1/2) · Reference model for 3PLZ</div>
+  </div>
+
+</div>
+
+<p>The hairpin in Pattern 1 is the most important concept for rule construction. Traffic arriving from the internet hits the <code>untrust</code> zone, is DNAT'd to a server IP in the <code>DMZ</code> zone (the <code>AO-DATACENTER-*</code> object for that server), and then optionally reaches the <code>trust</code> zone (<code>NG-DATACENTER-*</code> for DC backends). The outbound path skips the DMZ entirely: <code>trust → untrust</code> with SNAT to the egress IP pool. No NG or AO object ever appears on the <code>untrust</code> side — it is always <code>any</code>.</p>
+
+<!-- ────────────────────────────── -->
+<h3 id="ng-zone-map">NG→zone mapping — the join record</h3>
+
+<p><code>ng_zone_map.json</code> is the artifact that closes the gap between the CCD EDL platform and the Panorama policy model. It is generated deterministically by the extraction pipeline and encodes the following per firewall stack:</p>
+
+<pre><span class="c">// ng_zone_map.json — one entry per stack</span>
+{
+  <span class="k">"PAZSHDC-SEC-WIR-Stack"</span>: {
+    <span class="k">"panorama"</span>: <span class="s">"PAZSHDC"</span>,
+    <span class="k">"flow_pattern"</span>: <span class="s">"INTERNET-EDGE"</span>,
+    <span class="k">"nat_model"</span>: <span class="s">"SNAT-egress + DNAT-inbound"</span>,
+    <span class="k">"zones"</span>: {
+      <span class="k">"Inside"</span>: {
+        <span class="k">"zone_class"</span>: <span class="s">"TRUST"</span>,
+        <span class="k">"connected_networks"</span>: [<span class="s">"10.123.159.0/24"</span>],
+        <span class="k">"ng_categories"</span>: [<span class="s">"CORP"</span>, <span class="s">"CAREPLUS"</span>, <span class="s">"DATACENTER"</span>, <span class="v">...8 more</span>],
+        <span class="k">"ao_categories"</span>: [<span class="s">"CORP"</span>, <span class="s">"CAREPLUS"</span>, <span class="s">"DATACENTER"</span>],
+        <span class="k">"profile_group_default"</span>: <span class="s">"BP_SPG_User_Internet_Model"</span>,
+        <span class="k">"snat_applies"</span>: <span class="v">false</span>
+      },
+      <span class="k">"DMZ"</span>: {
+        <span class="k">"zone_class"</span>: <span class="s">"DMZ"</span>,
+        <span class="k">"connected_networks"</span>: [<span class="s">"204.99.13.0/24"</span>],
+        <span class="k">"ng_categories"</span>: [],
+        <span class="k">"ao_categories"</span>: [<span class="s">"DATACENTER"</span>, <span class="s">"COLO"</span>],
+        <span class="k">"profile_group_default"</span>: <span class="s">"BP_SPG_DMZ_Model"</span>,
+        <span class="k">"snat_applies"</span>: <span class="v">true</span>
+      }
+    }
+  }
+}</pre>
+
+<p>The constraint rules encode which NG/AO categories are valid per zone class, with a <code>hard</code> flag that distinguishes warnings from blocking violations:</p>
+
+<pre><span class="c">// Zone constraint rules — ng_constraints section</span>
+<span class="k">"CORP"</span>:    { <span class="k">"class"</span>: <span class="s">"TRUST"</span>,       <span class="k">"hard"</span>: <span class="v">false</span>, <span class="k">"pci"</span>: <span class="v">false</span> }
+<span class="k">"PARTNER"</span>: { <span class="k">"class"</span>: <span class="s">"VPN-PARTNER"</span>, <span class="k">"hard"</span>: <span class="v">true</span>,  <span class="k">"pci"</span>: <span class="v">false</span> }  <span class="c">// isolation violation if in TRUST</span>
+<span class="k">"RETAIL"</span>:  { <span class="k">"class"</span>: <span class="s">"TRUST"</span>,       <span class="k">"hard"</span>: <span class="v">true</span>,  <span class="k">"pci"</span>: <span class="v">true</span>  }  <span class="c">// PCI-scoped</span>
+<span class="k">"AZURE"</span>:   { <span class="k">"class"</span>: <span class="s">"CLOUD-DMZ"</span>,   <span class="k">"hard"</span>: <span class="v">false</span>, <span class="k">"pci"</span>: <span class="v">false</span> }
+<span class="c">// AO constraints</span>
+<span class="k">"DATACENTER"</span>: { <span class="k">"class"</span>: <span class="s">"DMZ"</span>, <span class="k">"hard"</span>: <span class="v">false</span> }  <span class="c">// published server IPs — DMZ leg</span></pre>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="profile-groups">Security profile groups</h2>
+
+<p>A security profile group bundles four distinct profile types into a single named object that attaches to a security rule. The group — not the individual profiles — is what a rule references.</p>
+
+<table>
+  <thead><tr><th>Component</th><th>Controls</th><th>Default action when triggered</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Antivirus</strong></td><td>File type, transfer direction, protocol decoders</td><td>Block on known malware signatures</td></tr>
+    <tr><td><strong>Vulnerability / IPS</strong></td><td>Threat severity thresholds, CVE coverage, evasion detection</td><td>Block critical/high; alert medium/low</td></tr>
+    <tr><td><strong>URL filtering</strong></td><td>Category allow/block/continue, safe search, credential detection</td><td>Block prohibited categories; log all</td></tr>
+    <tr><td><strong>File blocking / WildFire</strong></td><td>File type submissions, malware analysis, sandbox detonation</td><td>Forward suspicious files; block on verdict</td></tr>
+  </tbody>
+</table>
+
+<h4>Profile groups in the estate</h4>
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Rules using it</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Alert-All-SPG</strong></td><td><span class="tag tag-coral">permissive</span></td><td>15,448 (98%)</td><td>Alert only — no blocking. Current de facto default.</td></tr>
+    <tr><td><strong>BP_SPG_DMZ_Model</strong></td><td><span class="tag tag-teal">strict</span></td><td>&lt;1%</td><td>Best practice for DMZ/extranet. Blocks critical/high threats.</td></tr>
+    <tr><td><strong>BP_SPG_User_Internet_Model</strong></td><td><span class="tag tag-teal">strict</span></td><td>&lt;1%</td><td>Best practice for user internet egress. URL filter + AV + IPS.</td></tr>
+    <tr><td><strong>Trusted-Apps</strong></td><td><span class="tag tag-purple">moderate</span></td><td>&lt;1%</td><td>Partner/VPN traffic. App-aware, no URL filter.</td></tr>
+    <tr><td><strong>Alert-All-SPG-URL</strong></td><td><span class="tag tag-coral">permissive</span></td><td>&lt;1%</td><td>Alert + URL category logging. No blocking.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-err">
+  <p><strong>Profile gap is the single largest security posture issue in the estate.</strong> The content inspection infrastructure (Threat Prevention, URL Filtering, WildFire) is deployed and licensed but operationally inert on 98% of traffic. FPMS addresses this at rule creation time by auto-assigning the appropriate profile group and flagging any selection of Alert-All-SPG.</p>
+</div>
+
+<!-- ────────────────────────────── -->
+<h3 id="structures">Three-structure policy model</h3>
+
+<p>The zone protection profile and the security profile group are two different objects serving different purposes that are frequently confused.</p>
+
+<dl>
+  <dt>Zone protection profile (Structure 2, zone-level)</dt>
+  <dd>Attaches to the zone itself, not to individual rules. Runs before rule evaluation. Controls flood protection (SYN, UDP, ICMP), reconnaissance detection (port scan, host sweep), and packet-based attacks. <code>ZPP-no-Spoof</code> is applied to Inside, DMZ-PDE, and Semafone_DMZ on PAZSHDC-SEC-EXT-NET. Missing from outside-facing zones on MID/WIN stacks.</dd>
+
+  <dt>Security profile group (Structure 2, rule-level)</dt>
+  <dd>Attaches to individual security rules. Fires after rule match. Controls content inspection — what the firewall does with matched sessions. This is the object that is near-universally set to <code>Alert-All-SPG</code>.</dd>
+
+  <dt>Log forwarding profile (Structure 2, rule-level)</dt>
+  <dd>Controls where session logs go. Per-rule. Should send to Panorama for all rules, with selected rules additionally forwarding to SIEM/syslog. Currently inconsistently applied.</dd>
+</dl>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="findings">Estate analysis findings</h2>
+
+<div class="finding">
+  <span class="finding-sev fs-high">HIGH</span>
+  <div class="finding-body"><strong>98% of rules use Alert-All-SPG.</strong> 15,448 of 15,629 security rules across DG_AZ_Egress and DG_RI_Egress. Best-practice profiles are defined in shared but applied to fewer than 181 rules combined. No blocking occurs on content inspection across the vast majority of the estate's internet-facing traffic.</div>
+</div>
+<div class="finding">
+  <span class="finding-sev fs-high">HIGH</span>
+  <div class="finding-body"><strong>No NG→zone join record exists.</strong> The 728 CCD EDL objects have no formal mapping to zone names in Panorama. Engineers building rules have no validated reference for which zone a given NG/AO category belongs in — the gateway to zone misplacement and unintended policy bypass.</div>
+</div>
+<div class="finding">
+  <span class="finding-sev fs-med">MED</span>
+  <div class="finding-body"><strong>Zone naming is inconsistent across stacks.</strong> <code>inside</code> vs <code>Inside</code> (case mismatch), DMZ vs DMZ2 vs DMZ-PDE vs APP_DMZ vs xpe — 22+ distinct zone names across 29 stacks. Rules written with the wrong zone name for the target stack silently fail to match traffic.</div>
+</div>
+<div class="finding">
+  <span class="finding-sev fs-med">MED</span>
+  <div class="finding-body"><strong>eDMZ NAT tables are unmaintained AO equivalents.</strong> mid-edmz has 1,372 NAT rules and win-edmz has 1,009 — one per server in AO-DATACENTER-MIDDLETOWN-CT-AETNA-MDC and AO-DATACENTER-WINDSOR-CT-AETNA-WDC respectively. The NAT table and the AO objects are two independently maintained representations of the same server inventory.</div>
+</div>
+<div class="finding">
+  <span class="finding-sev fs-med">MED</span>
+  <div class="finding-body"><strong>Zone protection profiles inconsistently applied.</strong> ZPP-no-Spoof applied to inside-facing zones on PAZSHDC-SEC-EXT-NET but not consistently on outside-facing interfaces. MID/WIN outside interfaces carry no zone protection profile.</div>
+</div>
+<div class="finding">
+  <span class="finding-sev fs-high">HIGH</span>
+  <div class="finding-body"><strong>5,161+ rules in DG_AZ_Egress use destination <code>any</code>.</strong> Combined with Alert-All-SPG, this means a large portion of the egress rulebase provides neither destination specificity nor content inspection. FPMS addresses this at rule creation time by requiring named destination objects.</div>
+</div>
+<div class="finding">
+  <span class="finding-sev fs-info">INFO</span>
+  <div class="finding-body"><strong>LV-3rd_Party-Stack is the reference implementation for 3PLZ.</strong> Named tunnel zones (WEX-Meritain, EBIX-Meritain) per partner, no NAT, MPLS_DMZ for PPOM connectivity. This is the exact PARTNER-VPN pattern 3PLZ should replicate for new partner onboarding.</div>
+</div>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="rule-builder">Rule builder</h2>
+
+<p>The rule builder is a topology-aware form that guides engineers through five steps to produce a validated, commit-ready Panorama <code>set</code> command. Every field is constrained by topology data — no freetext zone names, no uncategorized address objects.</p>
+
+<h4>Step sequence</h4>
+
+<table>
+  <thead><tr><th>Step</th><th>Input</th><th>Intelligence</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>1 — Firewall</td>
+      <td>Panorama, flow pattern filter, stack selector</td>
+      <td>Stack selector populates from <code>full_topology.json</code>. Selecting a stack renders the flow strip showing the structural pattern and NAT model.</td>
+    </tr>
+    <tr>
+      <td>2 — Zones</td>
+      <td>Source zone (from), destination zone (to)</td>
+      <td>Zone chips rendered from actual topology — real names, zone class color-coded, connected network displayed. No freetext entry. Selecting a zone updates category hints for step 3.</td>
+    </tr>
+    <tr>
+      <td>3 — Objects</td>
+      <td>NG/AO/AD source objects, NG/AO/AD destination objects</td>
+      <td>Category picker filtered by valid categories for the selected zone. Object picker populated from <code>edl_catalog.json</code>. Each added object immediately coherence-checked against zone class — hard violations block submission.</td>
+    </tr>
+    <tr>
+      <td>4 — Service + profile</td>
+      <td>Service preset or custom port, profile group</td>
+      <td>Profile group auto-suggested from destination zone's default. Alert-All-SPG selection triggers upgrade warning. Service presets cover AD, LDAP, Kerberos, Web, and any.</td>
+    </tr>
+    <tr>
+      <td>5 — Review</td>
+      <td>Rule name, description, log setting</td>
+      <td>Validation summary must show zero hard errors before submit is enabled. Submit triggers review workflow (peer → security team → commit).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Output formats</h4>
+<p>The rule builder produces three output views in parallel:</p>
+<ul style="font-size:.87rem;color:var(--t2);padding-left:1.5rem;margin:.5rem 0;line-height:1.9">
+  <li><strong>Palo Alto CLI</strong> — complete <code>set</code> commands including EDL registrations, service object definitions, device-group scoping, and profile-setting. Paste-ready for Panorama CLI or commit script.</li>
+  <li><strong>Cisco FMC JSON</strong> — equivalent access rule as an FMC REST API payload with ExternalList source/destination objects and zone references.</li>
+  <li><strong>Summary</strong> — human-readable rule description with zone classes, subnet counts, NAT model, and profile group — suitable for change ticket description.</li>
+</ul>
+
+<!-- ────────────────────────────── -->
+<h3 id="validation">Validation engine</h3>
+
+<p>The validation engine runs on every state change and produces a categorized list of check results. Rules with hard errors cannot be submitted.</p>
+
+<table>
+  <thead><tr><th>Check</th><th>Severity</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Same-zone src/dst</td><td><span class="tag tag-amber">WARN</span></td><td><code>inside → inside</code> — intra-zone rules need explicit intra-zone policy enabled</td></tr>
+    <tr><td>PARTNER in TRUST zone</td><td><span class="tag tag-coral">ERR (hard)</span></td><td><code>NG-PARTNER-*</code> source with <code>inside</code> zone — isolation violation</td></tr>
+    <tr><td>AO-DATACENTER in UNTRUST</td><td><span class="tag tag-amber">WARN</span></td><td><code>AO-DATACENTER-*</code> destination with <code>outside</code> zone — should be DMZ leg</td></tr>
+    <tr><td>Alert-All-SPG selected</td><td><span class="tag tag-amber">WARN</span></td><td>No blocking — consider <code>BP_SPG_DMZ_Model</code></td></tr>
+    <tr><td>PCI-scoped object</td><td><span class="tag tag-amber">WARN</span></td><td><code>NG-RETAIL</code> — verify profile group includes PCI-compliant inspection</td></tr>
+    <tr><td>App-ID / port mismatch</td><td><span class="tag tag-amber">WARN</span></td><td>App-ID <code>kerberos</code> selected with port 443 — non-default, requires explicit service object</td></tr>
+    <tr><td>NAT policy reminder</td><td><span class="tag tag-gray">INFO</span></td><td>Pattern is SIMPLE-EDGE with SNAT — verify NAT policy covers source subnet</td></tr>
+    <tr><td>Rule coherent</td><td><span class="tag tag-teal">OK</span></td><td>All constraints satisfied — submit enabled</td></tr>
+  </tbody>
+</table>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="data-pipeline">Data pipeline</h2>
+
+<p>The pipeline converts four Panorama XML exports and 728 EDL files into the compact JSON repos the rule builder consumes. Today it runs manually; the production target is a scheduled automated run.</p>
+
+<pre><span class="c">Pipeline flow</span>
+
+Panorama REST API                   CCD Platform
+<span class="t">GET /restapi/v10.1/</span>               <span class="t">build_network_groups.py</span>
+<span class="t">Panorama/running-config</span>           <span class="t">→ 728 EDL .txt files</span>
+        │                                   │
+        ▼                                   ▼
+<span class="k">parse_panorama.py</span>              <span class="k">build_edl_catalog.py</span>
+<span class="t">├── full_topology.json</span>         <span class="t">├── edl_catalog.json</span>
+<span class="t">│   ├── stacks (29)</span>            <span class="t">│   ├── ng/ (349 objects)</span>
+<span class="t">│   ├── zones per stack</span>        <span class="t">│   └── ao/ (379 objects)</span>
+<span class="t">│   ├── interfaces + IPs</span>       └──────────────┐
+<span class="t">│   └── DG rule counts</span>                        │
+        │                                      │
+        ▼                                      ▼
+<span class="k">build_ng_zone_map.py</span>  ←─────────────────────────
+<span class="t">├── ng_zone_map.json</span>       <span class="c">cross-references topology</span>
+<span class="t">│   ├── zone class per zone</span>  <span class="c">with EDL categories</span>
+<span class="t">│   ├── NG/AO constraints</span>
+<span class="t">│   └── flow pattern per stack</span>
+└── <span class="t">rule_builder_data.json</span>    <span class="c">compact UI payload (~25KB)</span></pre>
+
+<h4>Production pipeline requirements</h4>
+<ul style="font-size:.87rem;color:var(--t2);padding-left:1.5rem;margin:.5rem 0;line-height:1.9">
+  <li>Scheduled config pull from all four Panoramas via REST API — daily minimum, triggered additionally on config push events</li>
+  <li>Diff detection: alert when new stacks appear, zones are renamed, or EDL objects are added/removed</li>
+  <li>Output published to a path accessible to the FPMS API layer</li>
+  <li>Extraction failure alerting — Panorama API auth expiry is the most likely failure mode</li>
+</ul>
+
+<!-- ────────────────────────────── -->
+<h3 id="api-layer">API layer</h3>
+
+<p>The production FPMS runs a thin FastAPI service over the JSON repos. Four endpoints cover the complete rule lifecycle.</p>
+
+<table>
+  <thead><tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/topology</code></td><td>GET</td><td>Return stack/zone/interface/DG data for the rule builder UI. Refreshed from pipeline on schedule.</td></tr>
+    <tr><td><code>/catalog</code></td><td>GET</td><td>Return NG/AO/AD objects with zone constraints and App-ID/service cross-reference. Supports search and category filter.</td></tr>
+    <tr><td><code>/validate</code></td><td>POST</td><td>Run coherence checks server-side before commit. Inputs: stack key, zone pair, source objects, destination objects, service, profile group. Returns ordered list of validation results with severity.</td></tr>
+    <tr><td><code>/commit</code></td><td>POST</td><td>Submit a validated rule. Two modes: ServiceNow CHG creation (default) or direct Panorama API push (post-approval). Requires completed review workflow.</td></tr>
+  </tbody>
+</table>
+
+<h4>Authentication</h4>
+<p>API authentication uses CVS SSO via service account tokens. The Panorama API credential used by the pipeline is a read-only service account. The commit path requires a separate write-privileged account gated behind the review workflow approval step.</p>
+
+<!-- ────────────────────────────── -->
+<h3 id="commit-path">Commit path</h3>
+
+<p>Two commit modes are supported, selecting based on operational maturity and change management requirements.</p>
+
+<dl>
+  <dt>Mode A — ServiceNow change ticket (default)</dt>
+  <dd><code>POST /commit</code> creates a ServiceNow CHG record with the validated rule payload as a structured attachment. The rule is not pushed to Panorama until the CHG is approved and the engineer manually executes the push. This is the appropriate path for high-risk rules or during initial FPMS rollout.</dd>
+
+  <dt>Mode B — Direct Panorama push (post-approval)</dt>
+  <dd>After peer review and security team approval, FPMS calls <code>POST /restapi/v10.1/DeviceGroup/{dg}/PreRulebase/SecurityRules</code> directly, followed by a Panorama commit. The CHG is still created for audit trail but is auto-approved by the system. Appropriate for standard-risk rules once the validation engine has been validated at scale.</dd>
+</dl>
+
+<pre><span class="c">Review workflow — required before commit</span>
+
+Engineer submits rule
+        │
+        ▼
+<span class="k">Peer review</span> (second network security engineer)
+        │  checks zone pair, object selection, service
+        ▼
+<span class="k">Security team approval</span> (NSE lead or designee)
+        │  validates profile group, checks against policy
+        ▼
+<span class="k">Commit</span>
+        ├── Mode A: ServiceNow CHG → manual Panorama push
+        └── Mode B: FPMS direct push → auto-approved CHG</pre>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="deliverables">Deliverables — current state</h2>
+
+<table>
+  <thead><tr><th>Artifact</th><th>Description</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><code>full_topology.json</code></td><td>Complete zone/interface/stack topology from all 4 Panoramas. 29 stacks, 97KB.</td><td><span class="tag tag-teal">Complete</span></td></tr>
+    <tr><td><code>ng_zone_map.json</code></td><td>Zone class constraints, flow patterns, NAT models per stack. 86KB.</td><td><span class="tag tag-teal">Complete</span></td></tr>
+    <tr><td><code>rule_builder_data.json</code></td><td>Compact UI payload combining topology and catalog. 25KB.</td><td><span class="tag tag-teal">Complete</span></td></tr>
+    <tr><td><code>edl_catalog.json</code></td><td>728 EDL objects catalogued with category, subnet count.</td><td><span class="tag tag-teal">Complete</span></td></tr>
+    <tr><td><code>fpms_wireframe.html</code></td><td>Fully functional dark-mode rule builder prototype. Topology-aware, live validation, PAN-OS CLI output.</td><td><span class="tag tag-teal">Complete</span></td></tr>
+    <tr><td><code>fpms_overview.html</code></td><td>Program brief with findings, topology diagrams, and roadmap. Stakeholder-ready.</td><td><span class="tag tag-teal">Complete</span></td></tr>
+    <tr><td><code>fpms_next_steps_prompt.md</code></td><td>Session continuation prompt for future development.</td><td><span class="tag tag-teal">Complete</span></td></tr>
+    <tr><td>Extraction scripts</td><td><code>parse_panorama.py</code>, <code>build_ng_zone_map.py</code> — functional, needs formalization into a proper repo.</td><td><span class="tag tag-amber">In progress</span></td></tr>
+    <tr><td>Service / App-ID repo</td><td>Applipedia + IANA cross-reference. <code>service_repo.json</code> schema designed, not yet populated.</td><td><span class="tag tag-coral">Planned</span></td></tr>
+    <tr><td>FPMS REST API</td><td>FastAPI service over JSON repos. Four endpoints designed, not yet implemented.</td><td><span class="tag tag-coral">Planned</span></td></tr>
+    <tr><td>Profile upgrade tooling</td><td>Bulk migration from Alert-All-SPG to appropriate BP_SPG_* profiles.</td><td><span class="tag tag-coral">Planned</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="roadmap">Roadmap</h2>
+
+<div class="rm-grid">
+  <div class="rm-row">
+    <div class="rm-phase"><div class="rm-phase-label">Phase 1</div><div class="rm-phase-weeks">Wks 1–2</div></div>
+    <div class="rm-body">
+      <div class="rm-title">Automate the data pipeline</div>
+      <div class="rm-desc">Scheduled Panorama config pull via REST API. Formalize extraction scripts into a version-controlled repo. Publish <code>ng_zone_map.json</code> + <code>edl_catalog.json</code> to a shared location. Diff-based alerting when topology or EDL catalog changes.
+      <br><span class="tag tag-gray" style="margin-top:.4rem;display:inline-block">Python</span> <span class="tag tag-gray">PAN-OS REST API</span> <span class="tag tag-gray">cron / Ansible</span></div>
+    </div>
+  </div>
+  <div class="rm-row">
+    <div class="rm-phase"><div class="rm-phase-label">Phase 2</div><div class="rm-phase-weeks">Wks 3–5</div></div>
+    <div class="rm-body">
+      <div class="rm-title">Stand up the FPMS API</div>
+      <div class="rm-desc">FastAPI service: <code>GET /topology</code>, <code>GET /catalog</code>, <code>POST /validate</code>, <code>POST /commit</code>. Validation logic server-side. ServiceNow integration for commit path. Auth via CVS SSO service account.
+      <br><span class="tag tag-gray" style="margin-top:.4rem;display:inline-block">FastAPI</span> <span class="tag tag-gray">Python</span> <span class="tag tag-gray">ServiceNow API</span> <span class="tag tag-gray">SSO</span></div>
+    </div>
+  </div>
+  <div class="rm-row">
+    <div class="rm-phase"><div class="rm-phase-label">Phase 3</div><div class="rm-phase-weeks">Wks 6–8</div></div>
+    <div class="rm-body">
+      <div class="rm-title">Build the App-ID and service repo</div>
+      <div class="rm-desc">Pull Applipedia via Panorama REST API. Cross-reference with IANA port registry CSV. Populate <code>service_repo.json</code>. Wire into rule builder: App-ID picker with default port suggestions; port-to-App-ID reverse lookup; application-default validation.
+      <br><span class="tag tag-gray" style="margin-top:.4rem;display:inline-block">Applipedia API</span> <span class="tag tag-gray">IANA CSV</span> <span class="tag tag-gray">PAN-OS App-ID</span></div>
+    </div>
+  </div>
+  <div class="rm-row">
+    <div class="rm-phase"><div class="rm-phase-label">Phase 4</div><div class="rm-phase-weeks">Wks 9–10</div></div>
+    <div class="rm-body">
+      <div class="rm-title">Rewire prototype UI to call the API</div>
+      <div class="rm-desc">Convert baked-in JSON constants to live API calls. Add review workflow UI. Add audit view: rule history, profile compliance %, shadow rule report. Deploy on internal CVS infra behind SSO.
+      <br><span class="tag tag-gray" style="margin-top:.4rem;display:inline-block">React / Vue</span> <span class="tag tag-gray">internal deploy</span></div>
+    </div>
+  </div>
+  <div class="rm-row">
+    <div class="rm-phase"><div class="rm-phase-label">Phase 5</div><div class="rm-phase-weeks">Wks 11–14</div></div>
+    <div class="rm-body">
+      <div class="rm-title">Profile upgrade campaign</div>
+      <div class="rm-desc">Parse all 15,629 PAZSHDC/RRISHDC rules. For each rule, determine appropriate BP_SPG_* profile based on zone pair. Generate Panorama set commands to update profile-setting. Prioritize by traffic volume (hit count). Execute in waves against non-production DGs first.
+      <br><span class="tag tag-coral" style="margin-top:.4rem;display:inline-block">High security value</span> <span class="tag tag-gray">Panorama batch</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────────────────────── -->
+<div class="section-rule"></div>
+<h2 id="3plz">3PLZ connection</h2>
+
+<p>FPMS is the operational tooling for the 3PLZ (Third-Party Landing Zone) program's partner onboarding workflow. The two programs share the PARTNER-VPN topology pattern and the NG/AO object model as their common foundation.</p>
+
+<p>The <strong>LV-3rd_Party-Stack</strong> (<code>DG_LV_3rd_Party</code>) is the production reference implementation for 3PLZ's architecture. It demonstrates:</p>
+
+<ul style="font-size:.87rem;color:var(--t2);padding-left:1.5rem;margin:.5rem 0 1rem;line-height:1.9">
+  <li>One named tunnel zone per partner (<code>WEX-Meritain</code>, <code>EBIX-Meritain</code>) — the zone boundary is the partner isolation policy</li>
+  <li><code>NG-PARTNER-{NAME}</code> maps 1:1 to the tunnel zone name — the object naming convention enforces the topology</li>
+  <li>No NAT — routed IPSec tunnels with PSK authentication generated by the self-service portal</li>
+  <li>MPLS_DMZ-1/2 for PPOM connectivity alongside IPSec tunnels</li>
+</ul>
+
+<p>When 3PLZ Phase 3D (vendor selection, target October 1, 2026) is complete, FPMS will be the tool used to onboard new partners into the production landing zone. Onboarding a new partner requires: create <code>NG-PARTNER-{NAME}</code> EDL object in CCD platform → pipeline picks it up → FPMS rule builder presents it as a valid source object in the PARTNER-VPN pattern → engineer builds allow rule from <code>NG-PARTNER-{NAME}</code> zone to <code>Trust-Inside</code> zone → submit for review → commit.</p>
+
+<div class="callout callout-info">
+  <p>The 3PLZ self-service portal generates the PSK per tenant and creates the IPSec tunnel configuration. FPMS handles the downstream firewall policy — the two systems are complementary, not overlapping. The portal owns the tunnel; FPMS owns the rule that permits traffic through it.</p>
+</div>
+
+</main>
+</div>
+
+<script>
+// Active TOC link tracking
+const sections = document.querySelectorAll('[id]');
+const tocLinks = document.querySelectorAll('.toc a');
+
+function updateTOC() {
+  let current = '';
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 80) current = s.id;
+  });
+  tocLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+
+document.getElementById('content').addEventListener('scroll', updateTOC);
+window.addEventListener('scroll', updateTOC);
+
+// Smooth scroll for TOC links
+tocLinks.forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+</script>
+
+</body>
+</html>
