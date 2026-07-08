@@ -1,0 +1,216 @@
+  
+  
+  
+  I need the configs for these FW
+  
+  
+PAZSHDC-SEC-EXT-VPN-01/02
+PAZSHDC-SEC-EXTRSIA-01/02
+PAZSHDC-SEC-EXTSIPA-01/02
+PAZSHDC-SEC-EXT-CTE-01/02
+PAZSHDC-SEC-UMSPRD-01/02
+RAZSHDC-SEC-INTRXC-01/02
+PAZSHDC-SEC-EXT-MPLSWEST-01/02-Everise
+
+
+RRICMDC-SEC-EXTRSIA-01/02
+RRICMDC-SEC-EXTSIPA-01/02
+RRICMDC-SEC-ENCEAST-01/02
+RRICMDC-SEC-INT-PCI-01/02
+RRICMDC-SEC-EXTATG-02
+RRICMDCSECINTFPRPCI-01
+RRICMCP-SEC-INTRXC-01/02
+RRIWSDC-SEC-UMSPRD-01/02
+RRIWSDC-SEC-INTPCIFTD-01/02
+RRIWSCP-SEC-INT-EMPTEMP-01/02
+RRIWSCP-SEC-INTDCOM-02
+RRIWSCP-SEC-STORELAB-01/02
+RRIWSCP-SEC-UMSNP-RetailNonProd-01/02
+RRIWSCP-SEC-UMSNP-RetailPT-01/02
+PRIWSDRSECEXTCA32-1-FTD
+RRICMCP-SEC-MPLSEAST-02-Genpact
+
+CDO Exports for these 
+
+PAZSHDC-SEC-EXT-NET4WIR-02 (all contexts)
+PAZSHDC-SEC-EXT-GUEST-02
+PAZSHDC-SEC-EXT-WFH-02
+RRIWSDC-SEC-INT-VPN-02
+RRIWSDC-SEC-EXT-GUEST-01
+RRIWSCP-SEC-EXT-VPN-02
+RRIWSCP-SEC-EXT-WFH-01/02
+
+
+And whatever we can get for these:
+
+pazshdcsecextrs-1 (contexts: RSIA, SIP, admin)
+10.46.193.15/49/55/57
+10.108.100.11/12
+  PAZSHDC-SEC-EXT-SDWAN-02                FPR4K-SM-12                         cdo
+  PAZSHDC-SEC-EXTRSIA-01                  Cisco Firepower 4145 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  PAZSHDC-SEC-EXTRSIA-02                  Cisco Firepower 4145 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RRICMDC-SEC-EXTRSIA-01                  Cisco Firepower 4145 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RRICMDC-SEC-EXTRSIA-02                  Cisco Firepower 4145 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RRIWSDC-SEC-EXT-SDWAN-01                FPR4K-SM-12                         cdo
+  RRIWSDC-SEC-EXT-SDWAN-02                FPR4K-SM-12                         cdo
+  rricmcpsecextrs-1-DMVPN                 ASA5585                             Unmanaged
+  rricmcpsecextrs-1-DMVPN-fo              ASA5585                             Unmanaged
+  rricmcpsecextrs-1-SIP                   ASA5585                             Unmanaged
+  rricmcpsecextrs-1-SIP-fo                ASA5585                             Unmanaged
+  rricmcpsecextrs-1-admin                 ASA5585                             Unmanaged
+  rricmcpsecextrs-1-admin-fo              ASA5585                             Unmanaged
+  CBN-SEC-T1B-APS-01                      ASA5555 (V05)                       cdo
+  CBN-SEC-T1B-APS-02                      ASA5555 (V05)                       cdo
+  CNR-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  CNR-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  EDA-SEC-M1A-MAT-01-FO                   ASA5555                             Unmanaged
+  ENN-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  ENN-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  EWN-FW-CONDUENT                                                             cdo [UNREACH]
+  FRG-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  FRG-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  GLO-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  GLO-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  INI-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  INI-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  JCY-DIC-SEC-01                          Cisco Firepower 2130 Threat Defen…  rricmdcsecfmcnonprod-01
+  JCY-DIC-SEC-02                          Cisco Firepower 2130 Threat Defen…  rricmdcsecfmcnonprod-01
+  KNN-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  KNN-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  KNV-SEC-M1A-WMS-01                      ASA5516 (V05)                       cdo
+  KNV-SEC-M1A-WMS-02                      ASA5516 (V05)                       cdo
+  KPL-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  KPL-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  LDN-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  LDN-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  LUM-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  LUM-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  NAA-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  NAA-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  NOV-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  NOV-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  NSF-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  NSF-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  ORA-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  ORA-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  PAT-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  PAT-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  PAZSHDC-SEC-EXT-RS-02                   ASA5585-SSP-60                      cdo
+  PAZSHDC-SEC-INTEXP-02                   Cisco Firepower 4145 Threat Defen…  rricmdc-sec-mgt-prd-pci-01
+  PAZSHDC-SEC-INTWIR-02                   FPR4K-SM-44S                        cdo
+  PCARCCMSECINT-01                                                            cdo [UNREACH]
+  PCASTPV-SEC-DC-5NINE-FTD-01             Cisco Firepower 4145 Threat Defen…  rriwsdcseccldfmc-02
+  PCASTPV-SEC-DC-5NINE-FTD-02             Cisco Firepower 4145 Threat Defen…  rriwsdcseccldfmc-02
+  PGATLPV-SEC-DC-5NINE-FTD-01             Cisco Firepower 4145 Threat Defen…  rriwsdcseccldfmc-02
+  PGATLPV-SEC-DC-5NINE-FTD-02             Cisco Firepower 4145 Threat Defen…  rriwsdcseccldfmc-02
+  PRIWSDRSECEXTCA32-1-FTD                 Cisco Firepower 4150 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  RAZSHDCSECINTDRGW-01                                                        cdo [UNREACH]
+  RCALHDI-SEC-MDF-INT-01                  ASA5516 (V05)                       cdo
+  RCALHDI-SEC-MDF-INT-02                  ASA5516 (V05)                       cdo
+  RFLVBDI-SEC-MDF-INT-01                  ASA5516 (V05)                       cdo
+  RFLVBDI-SEC-MDF-INT-02                  ASA5516 (V05)                       cdo
+  RNYWVDI-SEC-MDF-INT-01                  ASA5516 (V05)                       cdo
+  RNYWVDI-SEC-MDF-INT-02                  ASA5516 (V05)                       cdo
+  RPASTDI-SEC-MDF-INT-01                  ASA5516 (V05)                       cdo
+  RPASTDI-SEC-MDF-INT-02                  ASA5516 (V05)                       cdo
+  RRICMCP-SEC-MPLEAST-01                  ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01-Fiserv           ASA5585                             Unmanaged
+  RRICMCP-SEC-MPLEAST-01-Fiserv-fo        ASA5585                             Unmanaged
+  RRICMCP-SEC-MPLEAST-01-conduent         ASA5585                             Unmanaged
+  RRICMCP-SEC-MPLEAST-01-conduent-fo      ASA5585                             Unmanaged
+  RRICMCP-SEC-MPLEAST-01/Concentrix                                           cdo [UNREACH]
+  RRICMCP-SEC-MPLEAST-01/TTEC             ASA5585-SSP-60                      cdo [UNREACH]
+  RRICMCP-SEC-MPLEAST-01/anthem           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/britishtelecom   ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/continuum        ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/convey           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/endeavor         ASA5585-SSP-60                      cdo [UNREACH]
+  RRICMCP-SEC-MPLEAST-01/geneva           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/heartland        ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/mckesson         ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/medcare          ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/medhok           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/merwin           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/omnicare         ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/opera            ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/tcs              ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-01/wellpartner      ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02                  ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/TTEC             ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/anthem           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/britishtelecom   ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/continuum        ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/convey           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/endeavor         ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/geneva           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/heartland        ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/mckesson         ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/medcare          ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/medhok           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/merwin           ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/omnicare         ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/opera            ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/tcs              ASA5585-SSP-60                      cdo
+  RRICMCP-SEC-MPLEAST-02/wellpartner      ASA5585-SSP-60                      cdo
+  RRICMDC-SEC-EXTATG-02                   Cisco Firepower 4145 Threat Defen…  rricmdc-sec-mgt-prd-pci-01
+  RRIWFDI-SEC-MDF-INT-01                  ASA5516 (V05)                       cdo
+  RRIWFDI-SEC-MDF-INT-02                  ASA5516 (V05)                       cdo
+  RRIWNCP-SEC-INTPRT-02                   ASA5525 (V04)                       cdo
+  RRIWSCP-SEC-EXT-VF-01-FO.cvs.com        ASA5550                             Unmanaged
+  RRIWSCP-SEC-EXT-VF-01.cvs.com           ASA5550                             Unmanaged
+  RRIWSCP-SEC-UMSNP-RetailNonProd-01      Cisco Firepower 4145 Threat Defen…  rricmdcsecfmcnonprod-01
+  RRIWSCP-SEC-UMSNP-RetailNonProd-02      Cisco Firepower 4145 Threat Defen…  rricmdcsecfmcnonprod-01
+  RRIWSCP-SEC-UMSNP-RetailPT-01           Cisco Firepower 4145 Threat Defen…  rricmdcsecfmcnonprod-01
+  RRIWSCP-SEC-UMSNP-RetailPT-02           Cisco Firepower 4145 Threat Defen…  rricmdcsecfmcnonprod-01
+  RRIWSDC-SEC-INT121B-01/admin            ASA5585-SSP-40                      cdo [UNREACH]
+  RRIWSDC-SEC-INT121B-01/pbm-retail       FPR4K-SM-44S                        cdo
+  RRIWSDC-SEC-INT121B-02/admin            ASA5585-SSP-40                      cdo
+  RRIWSDC-SEC-INT121B-02/pbm-retail       FPR4K-SM-44S                        cdo
+  SMR-SEC-M1A-WMS-01-A                    Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  SMR-SEC-M1A-WMS-01-S                    Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  TON-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  TON-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  UMS-AZ-PT-NONPROD-ASA-2-PT              ASA5585                             Unmanaged
+  UMS-AZ-PT-NONPROD-ASA-2-admin           ASA5585                             Unmanaged
+  VOB-SEC-M1A-WMS-01                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  VOB-SEC-M1A-WMS-02                      Cisco Firepower 2130 Threat Defen…  rricmdc-sec-int-prd-mgt-01
+  epo-fw-hgs-1                            Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  epo-fw-hgs-2                            Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  epsfire1                                                                    cdo [UNREACH]
+  ewn-fw-conduent-1                       Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  ewn-fw-conduent-2                       Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  lgs1501-01b-0104-usr-pa-fw01            PA-5445                             pazshdc-sec-pan-prod-01
+  lgs1501-01b-0105-ext-pa-fw01            PA-5445                             pazshdc-sec-pan-prod-01
+  lgs1502-10c-0104-usr-pa-fw02            PA-5445                             pazshdc-sec-pan-prod-01
+  lgs1502-10c-0105-ext-pa-fw02            PA-5445                             pazshdc-sec-pan-prod-01
+  mid-fw-perfdmz-1                        Cisco Firepower 4145 Threat Defen…  mid-fmc-nonprod-1
+  mid-fw-perfdmz-2                        Cisco Firepower 4145 Threat Defen…  mid-fmc-nonprod-1
+  mid-fw-proxy-1                          Cisco Firepower 4145 Threat Defen…  mid-fmc-prod-1
+  mid-fw-proxy-2                          Cisco Firepower 4145 Threat Defen…  mid-fmc-prod-1
+  pazphccsecintmat-1                      ASA5516 (V04)                       cdo [UNREACH]
+  pazphccsecintmat-2                      ASA5516 (V04)                       cdo
+  pazshdcsecumsptnp-1.caremarkrx.net      ASA5585                             Unmanaged
+  pmnedpvsecintmdf-1                                                          cdo [DECOM] [UNREACH]
+  rfloromsecintmat-1                                                          cdo [UNREACH]
+  sct-fw-cvs-ftd-1                        Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  sct-fw-cvs-ftd-2                        Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  snd-fw-conduent-1                       Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  snd-fw-conduent-2                       Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  win-fw-ironman-2                        Cisco Firepower 2130 Threat Defen…  mid-fmc-prod-1
+  
+  PAZSHDC-SEC-EXT-CTE-01                  Cisco Firepower 2130 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  PAZSHDC-SEC-EXT-CTE-02                  Cisco Firepower 2130 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RAZSHDC-SEC-INTRXC-01                   Cisco Firepower 4145 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RAZSHDC-SEC-INTRXC-02                   Cisco Firepower 4145 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RRICMCP-SEC-INTRXC-01                   Cisco Firepower 4145 Threat Defen…  rricmdcsecfmcnonprod-01
+  RRICMCP-SEC-INTRXC-02                   Cisco Firepower 4145 Threat Defen…  rricmdcsecfmcnonprod-01
+  RRICMDC-SEC-ENCEAST-01                  Cisco Firepower 2130 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RRICMDC-SEC-ENCEAST-02                  Cisco Firepower 2130 Threat Defen…  pazshdc-sec-int-prd-mgt-01
+  RRIWSCP-SEC-EXT-AET-02                  FPR-2140                            cdo
+
+  10.108.100.11                             Aetna WAN Hub FW HA pair — Edwardsville IL
+  10.108.100.12                             Aetna WAN Hub FW HA pair — Edwardsville IL
+
+
+
+  
